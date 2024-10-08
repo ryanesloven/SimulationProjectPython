@@ -30,7 +30,8 @@ class Driver:
         Track = DataTracker.DataTracker()
         Sim = Simulation.Simulation(self.policy, self.algorithm, Inbound, Outbound, Track)
         Arrive = Arrival.Arrival(Inbound, Track, self.SimulationTimer)
-        ##Code that setsup first trains. 
+
+        ##prints out inbound yard before simulation
         for i in range(len(Inbound.Tracks)):
             print(str(i) + ": " + str(len(Inbound.Tracks[i].storedTrains)))
             for j in range(len(Inbound.Tracks[i].storedTrains)):
@@ -47,7 +48,7 @@ class Driver:
             elif(int(self.algorithm) == 2):
                 ##currentTime =+ Sim.callDynamic()
                 self.currentTime =+ Arrive.forecast(self.currentTime)
-        print(counter)
+        ##prints out inbound yard after simulation
         for i in range(len(Inbound.Tracks)):
             print(str(i) + ": " + str(len(Inbound.Tracks[i].storedTrains)))
             for j in range(len(Inbound.Tracks[i].storedTrains)):

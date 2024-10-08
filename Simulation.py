@@ -193,7 +193,7 @@ class Simulation:
                     ##print(carsSorted)
                     carsSorted = carsSorted + 1
         """
-        time.sleep(1)
+
         stop = time.perf_counter() / 1000
         duration = stop-begin
         if(carsSorted>0):

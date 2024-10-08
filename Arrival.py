@@ -10,8 +10,6 @@ class Arrival:
             return 0
     def __init__(self, In, Track, SimTime):
         self.lastTime = 0
-        self.MaxTime = 0
-        self.delay = 0
         self.Inbound = In
         self.Tracker = Track
         self.MaxTime = SimTime
