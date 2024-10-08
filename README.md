@@ -35,253 +35,498 @@ Citations:
 
  
 Overview:
+
 The simulation is controlled from the Driver class, the class determines how the simulation is run within the start() method. The class also has the getSettings() method which is used to determine which policy and simulation will be used for classifying the railcars. 
 The first class to be called in Start() is the Simulation class. The class will be passed Settings data which is used to determine which Policy and which Simulation type will be used for this iteration. 
+
 The second class to be called in Start() is the DataTracker class. This class takes care of data recording during the simulation.
+
 The third class to be called is the InboundYard class which receives data on inbound trains and railcars it will hold. The InboundYard class is concerned with Railcars which are their own class. It also works with the InboundTrackClass.
+
 The fourth class to be called is the OutboudnYard class which receives data on outbound trains and railcars it will hold. The OutboundYard class is concerned with Railcars which are their own class. It also works with the OutboundTrackClass.
+
 The fifth class to be called is the Simulation class which is used to access the algorithm and policy that will classify railcars.
+
 The sixth class to be called is the Arrival class which is used to have trains enter the inbound yard at random intervals.
+
 Driver Class:
+
 This class is the controller for the entire simulation. It contains six and three functions.
 Variables:
+
 •	inboundTrackNum:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the number of tracks for the InboundYard
+
 •	outboundTrackNum:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the number of tracks for the OutboundYard
+
 •	Policy:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate which policy is to be used for the simulation
+
 •	Algorithm:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate which algorithm will be used for the simulation
+
 •	SimulationTimer:
+
 o	Data Type: Integer
+
 o	Purpose: To track the maximum time that can elapse for the simulation
+
 •	currentTime:
+
 o	Data Type: Integer
+
 o	Purpose: To increment the timer towards the SimulationTimer
+
 Functions:
+
 •	GetSettings:
+
 o	ReturnType: None
+
 o	Purpose: To gain information on how the simulation will be run.
+
 •	Start:
+
 o	Return Type: None
+
 o	Purpose: To run the simulation, it is in-charge of how the simulation progresses. 
+
 DataTracker:
+
 This class is responsible for tracking and recording data. It has four variables and two functions.
+
 Variables:
+
 •	FunctionDataStorage:
+
 o	Data Type: String
+
 o	Purpose: To hold the path to the document that holds data on functions performed in the simulation.
+
 •	OperationDataStorage:
+
 o	Data Type: String
+
 o	Purpose: To hold the path to the document that holds data on operations performed in the simulation.
+
 •	Function:
+
 o	Data Type: ofstream
+
 o	Purpose: To write to the function data storage.
+
 •	Operation:
+
 o	Data Type: ofstream
+
 o	Purpose: To write to the operation data storage.
+
 Functions:
+
 •	functionTime:
+
 o	Data Type: ofstream
+
 o	Purpose: To write provided data to the function data storage.
+
 •	operationTime:
+
 o	Data Type: ofstream
+
 o	Purpose: To write provided data to the operation data storage.
+
 Simulation:
+
 This class is responsible for storing and accessing the policy and algorithm that will be used for a run of the simulation. The function contains four variables and three functions.
+
 Variables:
+
 •	Policy:
+
 o	Data Type: Integer
+
 o	Purpose: To determine which policy is to be used for this run of the simulation.
+
 •	Algorithm:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the algorithm used for simulation
+
 •	Inbound:
+
 o	Data Type: InboundYard Object
+
 o	Purpose: To use InboundYard object for simulation
+
 •	Outbound:
+
 o	Data Type: OutboundYard Object
+
 o	Purpose: To use OutboundYard object for simulation
+
 •	Tracker:
+
 o	Data Type: DataTracker Object
+
 o	Purpose: To use the DataTracker object for data recording
+
 Functions:
+
 •	callGreedy:
+
 o	Return Type: Integer
+
 o	Purpose: Performs simulation using the Greedy algorithm.
+
 •	callDynamic:
+
 o	Return Type: Integer
+
 o	Purpose: Performs simulation using Dynamic Programming algorithm.
+
 •	sendOutbound:
+
 o	Return Type: Integer
+
 o	Purpose: Empties outbound tracks in the Outbound yard that are at capacity.
+
 InboundTrack:
+
 This class describes railcars on the inbound track. The class has four variables and three functions.
 Variables:
+
 •	TrackID: 
+
 o	Data Type: Integer
+
 o	Purpose: To identify the specific InboundTrack an object is.
+
 •	TrackCapacity:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate how full the track is, that is how many railcars it is currently holding.
+
 •	Length:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the length of the first train in the track.
+
 •	outboundTrackNum:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the number of tracks in the OutboundYard
+
 Functions:
+
 •	addRailcars:
+
 o	Return Type: None
+
 o	Purpose: To add a railcar to the Inbound Track
+
 •	removeRailcar:
+
 o	Return Type: None
+
 o	Purpose: To remove a railcar from the Inbound Track
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Intitializes InboundTrack object.
+
 InboundYard:
+
 This class represents the classification tracks within a railyard. It has four variables and five functions. 
+
 Variables:
+
 •	TrackNumber:
+
 o	Data Type: Integer
+
 o	Purpose: To identify the classification track
+
 •	TrackStatus:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the number of railcars currently on the track.
+
 •	TrackCapacity:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the maximum number of railcars the track can hold.
+
 •	Destination:
+
 o	Data Type: Stirng
+
 o	Purpose: To identify the destination to which all railcars on the track are headed to. 
+
 Functions:
+
 •	GetTrackNumber:
+
 o	Return Type: Integer
+
 o	Purpose: To return the track number and identify the track.
+
 •	GetTrackStatus:
+
 o	Return Type: Integer
+
 o	Purpose: To indicate how many railcars the track has on it.
+
 •	UpdateStatus:
+
 o	Return Type: None
+
 o	Purpose: To change data regarding the number of railcars on the track.
+
 •	GetDestination:
+
 o	Return Type: String
+
 o	Purpose: To indicate the destination of all railcars on the track.
+
 •	RequestEngine:
+
 o	Return Type: None
+
 o	Purpose: To have all railcars on the track moved to their shared destination. Clears all railcars from the track.
+
 Railcar:
+
 This class is the blueprint for the railcar objects that are used throughout the simulation. The class has five variables and one function.
+
 Variables:
+
 •	Destination:
+
 o	Data Type: Integer
+
 o	Purpose: To identify the track that the railcar is wants to go to.
+
 •	RailcarID:
+
 o	Data Type: Integer
+
 o	Purpose: A unique ID to identify the railcar.
+
 •	TrainID:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate what train the railcar is associated with.
+
 •	TrackNumber:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate what track the railcar is on. 
+
 •	Priority: 
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the value of the railcar being sorted compared to not being sorted.
+
 Functions: 
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Initialize a railcar object.
+
 Train:
+
 This class is the blueprint for the train objects that are used throughout the simulation. The class has five variables and one function.
+
 Variables:
+
 •	Destinations:
+
 o	Data Type: Integer List
+
 o	Purpose: To identify the track that the railcars wants to go to.
+
 •	TrainID:
+
 o	Data Type: Integer
+
 o	Purpose: A unique ID to identify the train.
+
 •	TotalPriority:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the total value of a train.
+
 •	Length:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the length of the train. 
+
 •	Cars: 
+
 o	Data Type: Railcar List
+
 o	Purpose: To hold railcars that are in the train.
+
 Functions: 
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Initialize a train object.
+
 OutboundTrack:
+
 This class is the blueprint for the OutboudnTrack objects that are used throughout the simulation. The class has five variables and one function.
+
 Variables:
+
 •	TrackNumber:
+
 o	Data Type: Integer 
+
 o	Purpose: To identify the track
+
 •	Available:
+
 o	Data Type: Integer
+
 o	Purpose: To track the number of cars on each track.
+
 •	TrackID:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate each track.
+
 •	Cars:
+
 o	Data Type: Railcar List
+
 o	Purpose: To store railcars on the track
+
 •	TrackCapacity: 
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the maximum amount of railcars a track can hold.
+
 Functions: 
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Initialize an OutboundTrack object.
+
 OutboundYard:
+
 This class is the blueprint for the OutboudnYard objects that are used throughout the simulation. The class has two variables and three function.
+
 Variables:
+
 •	NumberTracks:
+
 o	Data Type: Integer 
+
 o	Purpose: Used to indicate the number of tracks in the yard.
+
 •	Tracks:
+
 o	Data Type: OutboundTrack List
+
 o	Purpose: Used to hold tracks associated with the yard.
+
 Functions: 
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Initialize an OutboundYard object.
+
 •	addTrain:
+
 o	Return Type: Integer
+
 o	Purpose: Add train to tracks depending on destination.
+
 •	AddRailcar:
+
 o	Return Type: Integer
+
 o	Purpose: Add railcar to track depending on destination.
+
 Arrival:
+
 This class is the blueprint for the Arrival objects that are used throughout the simulation. The class has four variables and two function.
+
 Variables:
+
 •	lastTime:
+
 o	Data Type: Integer 
+
 o	Purpose: To identify the last time that a train has arrived
+
 •	Inbound:
+
 o	Data Type: InboundYard Object
+
 o	Purpose: To allow access to InboundYard to add train to.
+
 •	MaxTime:
+
 o	Data Type: Integer
+
 o	Purpose: To indicate the maximum time the simulation can go for.
+
 •	Tracker:
+
 o	Data Type: DataTracker Object
+
 o	Purpose: To access DataTracker functions for data recording.
+
 Functions: 
+
 •	Initialize:
+
 o	Return Type: None
+
 o	Purpose: Initialize an OutboundTrack object.
+
 •	Forecast:
+
 o	Return Type: Integer
+
 o	Purpose: To randomly add a train to the inbound yard.
 
 
