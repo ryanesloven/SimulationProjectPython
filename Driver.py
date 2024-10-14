@@ -37,17 +37,24 @@ class Driver:
             for j in range(len(Inbound.Tracks[i].storedTrains)):
                 print(str(i) +" " + str(j)+ ": " + str(len(Inbound.Tracks[i].storedTrains[j].Cars)))
         counter = 0
+        lastTime = 0
         while (self.currentTime < self.SimulationTimer):
             if(int(self.algorithm) == 1):
                 counter = counter + Sim.callGreedy() / 10
-                
                 self.currentTime = self.currentTime +  counter*10
                 ##print(self.currentTime)
                 self.currentTime = self.currentTime + Arrive.forecast(self.currentTime)
+                if(self.currentTime==lastTime):
+                    self.currentTime = self.currentTime + 1
+                lastTime = self.currentTime
                 ##print(self.currentTime)
             elif(int(self.algorithm) == 2):
-                ##currentTime =+ Sim.callDynamic()
-                self.currentTime =+ Arrive.forecast(self.currentTime)
+                self.currentTime = self.currentTime + Sim.callDynamic()
+                self.currentTime = self.currentTime + Arrive.forecast(self.currentTime)
+                ##print("Time: "+str(self.currentTime))
+                if(self.currentTime==lastTime):
+                    self.currentTime = self.currentTime + 1
+                lastTime = self.currentTime
         ##prints out inbound yard after simulation
         for i in range(len(Inbound.Tracks)):
             print(str(i) + ": " + str(len(Inbound.Tracks[i].storedTrains)))

@@ -25,6 +25,70 @@ class Simulation:
                 tracksClear = tracksClear + 1
         return tracksClear
 
+    
+
+    def DynamicGreedyRailcar(self, choices, carsSorted, operationTime, start, invalid):
+        index = -1
+        max = -1
+        for i in range(len(choices)):
+            ##print(choices[i])
+            if(i not in invalid and self.Outbound.Tracks[choices[i].Destination].available > 0 and choices[i].Priority > max):
+                max = choices[i].Priority
+                index = i
+            else:
+                invalid.append(i)
+        if(max == -1):
+            stop = time.perf_counter() / 1000
+            duration = stop - start
+            operationTime = 650 * self.sendOutbound()
+            if(carsSorted>0):
+                print("reached")
+                self.Tracker.functionTime(duration)
+                self.Tracker.operationTime(carsSorted)
+            return operationTime
+        else:
+            self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+            self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+            if(len(self.Inbound.Tracks[index].storedTrains) > 0 and len(self.Inbound.Tracks[index].storedTrains[0].Cars) > 0):
+                choices[index] = self.Inbound.Tracks[index].storedTrains[0].Cars[0]
+            else:
+                choices[index] = -1
+                invalid.append(index)
+            carsSorted = carsSorted + 1
+            return self.DynamicGreedyRailcar(choices, carsSorted, operationTime, start, invalid) + 10
+        
+
+    def callDynamic(self):
+        max = 0 ##used to compare priority values of railcars and trains.
+        carsSorted = 0
+        operationTime = 0
+        self.policy = 1
+        begin = time.perf_counter() / 1000
+
+        if(self.policy==1):
+            invalid = []
+            choices = []
+            breakChecker = 0
+            for i in range(len(self.Inbound.Tracks)):
+                if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
+                    invalid.append(i)
+                    choices.append(-1)
+                    breakChecker = breakChecker + 1
+                else:
+                    choices.append(self.Inbound.Tracks[i].storedTrains[0].Cars[0])
+            if(breakChecker == len(self.Inbound.Tracks)):
+                return 0
+            else:
+                temp = self.DynamicGreedyRailcar(choices, 0, 0, begin, invalid)
+                if(temp > 0):  
+                    print(temp)
+                return temp
+
+        elif(self.policy==2):
+            pass
+        elif(self.policy==3):
+            pass
+
     def callGreedy(self):
         max = 0 ##used to compare priority values of railcars and trains.
         carsSorted = 0
@@ -33,89 +97,94 @@ class Simulation:
         index = 0 ##used to prevent unnecessary looping for queue/vector operations.
         skip = []
         begin = time.perf_counter() / 1000
-        if (self.policy == 1):
-            ValidExists = True; ##used to indicate if the max is valid or not
-            InvalidChoices = 0
-            findSkipIndex = 0
-            ##install checks for available space of tracks.
-            
-            #finds max priority of top value in queues.
-            while (ValidExists):
+        if (self.policy == 1): ##TMP-Full
+            max = -1
+            index = -1
+            invalid = []
+            while(True):
+                max = -1
+                invalid = []
                 for i in range(len(self.Inbound.Tracks)):
-                    ##ensures that the maximum, VALID railcar will be chosen
-                    if(self.Inbound.Tracks[i].storedTrains[0].TotalPriority > max and i not in skip):
+                    if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
+                        invalid.append(i)
+                    if(i not in invalid and self.Inbound.Tracks[i].storedTrains[0].TotalPriority > max ):
                         max = self.Inbound.Tracks[i].storedTrains[0].TotalPriority
                         index = i
-                    if (i in skip): ##used to determine if no valid choices exist
-                        InvalidChoices = InvalidChoices + 1
-                    ##exits if no entire train can be classified validly.
-                    if (InvalidChoices >= len(self.Inbound.Tracks)):
-                        ##end sorting
-                        ValidExists = False
-
-                ##move railcar to outbound yard and remove from inbound yard, also updates local data
-                for i in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
-                    if(self.Outbound.Tracks[self.Inbound.Tracks[index].storedTrains[0].Cars[i].Destination].available - 1 < 1):
-                        skip.push_back(index)
+                if(len(invalid) == len(self.Inbound.Tracks)):
+                    operationTime = operationTime + (self.sendOutbound() * 65)
+                    break
+                ##print(invalid)
+                ##print(index)
                 
-                ##checks that a valid option is chosen
-                if(index in skip):
-                    ##updates inbound and outbound yard with the train being removed and added respectively
-                    self.Outbound.addTrain(self.Inbound.Tracks[index].storedTrains[0])
-                    self.Inbound.removeRailcars(self.Inbound.Tracks[index].storedTrains[0])
-                    carsSorted += self.Inbound.Tracks[index].storedTrains[0].Cars.size()
-                    self.Tracker.operationtime(self.Inbound.Tracks[index].storedTrains[0].Cars.size())
+                ##print(len(self.Inbound.Tracks[index].storedTrains))
+                if(len(self.Inbound.Tracks[index].storedTrains) == 0):
+                    break
+
+                ##destination = self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination
+
+                for i in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
+                    destination = self.Inbound.Tracks[index].storedTrains[0].Cars[i].Destination
+                    if (self.Outbound.Tracks[destination].available < 1):
+                        invalid.append(index)
+                if(index in invalid):
+                    self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                    self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                    carsSorted = carsSorted + len(self.Inbound.Tracks[index].storedTrains[0].Cars)
+
             
         elif(self.policy == 2):
-            max = 0
-            index = 0
-            ValidExists = True ##used to indicate if the max is valid or not
-            InvalidChoices = 0
-            ##install checks for available space of tracks.
-            
-            #finds max priority of top value in queues.
-            while (ValidExists):
+            max = -1
+            index = -1
+            invalid = []
+            while(True):
+                max = -1
+                invalid = []
                 for i in range(len(self.Inbound.Tracks)):
-                    ##ensures that the maximum, VALID railcar will be chosen
-                    if(self.Inbound.Tracks[i].storedTrains[0].TotalPriority > max and i not in skip):
+                    if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
+                        invalid.append(i)
+                    if(i not in invalid and self.Inbound.Tracks[i].storedTrains[0].TotalPriority > max ):
                         max = self.Inbound.Tracks[i].storedTrains[0].TotalPriority
                         index = i
-                    
-                    if (i in skip): ##used to determine if no valid choices exist
-                        InvalidChoices = InvalidChoices + 1
-                    
-                    if (InvalidChoices >= len(self.Inbound.Tracks)):
-                        print("No Valid Choices")
-                        max = 0
-                        for i in range(len(self.Inbound.Tracks)):
-                            ##ensures that the maximum, railcar will be chosen
-                            if(self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max):
-                                max = self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority
-                                index = i
-                        
-                        for i in range(len(self.Inbound.Tracks[index].Cars)):
-                            if(self.Outbound.Tracks[self.Inbound.Tracks[index].storedTrains[0].Cars[i].Destination].Available - 1 > -1):
-                                self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[i])
-                                self.Inbound.removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[i])
-                                self.Tracker.operationtime(1)
-                                carsSorted += 1
-                            else:
-                                ValidExists = False
-                                return; ##gracefully exit after classification done to best of ability
-            
-                ##move railcar to outbound yard and remove from inbound yard, also updates local data
-                for i in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
-                    if(self.Outbound.Tracks[self.Inbound.Tracks[index].storedTrains[0].Cars[i].Destination].Available - 1 < 1):
-                        skip.push_back(index)
+                if(len(invalid) == len(self.Inbound.Tracks)):
+                    max = -1
+                    index = -1
+                    invalid = []
+                    for i in range(len(self.Inbound.Tracks)):
+                        if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
+                            invalid.append(i)
+                        if (i not in invalid and self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max ):
+                            max = self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority
+                            index = i
+                        ##print(invalid)
+                        ##print(index)
+                    for i in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
+                        ##print(len(self.Inbound.Tracks[index].storedTrains))
+                        if(len(self.Inbound.Tracks[index].storedTrains.Cars) == 0):
+                            break
+                        destination = self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination
+                        if (self.Outbound.Tracks[destination].available < 1):
+                            invalid.append(index)
+                            ##operationTime = operationTime + (self.sendOutbound() * 65)
+                        else:
+                            self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                            self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                            carsSorted = carsSorted + 1
+                    break
+                    ##print(invalid)
+                    ##print(index)
+                    ##print(len(self.Inbound.Tracks[index].storedTrains))
 
-                ##checks that a valid option is chosen
-                if(index in skip):
-                    ##updates inbound and outbound yard with the train being removed and added respectively
-                    self.Outbound.addTrain(self.Inbound.Tracks[index].storedTrains[0])
-                    self.Inbound.removeRailcars(self.Inbound.Tracks[index].storedTrains[0])
-                    carsSorted += len(self.Inbound.Tracks[index].storedTrains.front.Cars)
-                    self.Tracker.operationtime(len(self.Inbound.Tracks[index].storedTrains.front.Cars))
- 
+                    ##destination = self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination
+
+                for i in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
+                    destination = self.Inbound.Tracks[index].storedTrains[0].Cars[i].Destination
+                    if (self.Outbound.Tracks[destination].available < 1):
+                        invalid.append(index)
+
+                self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                carsSorted = carsSorted + len(self.Inbound.Tracks[index].storedTrains[0].Cars)
+
         elif (self.policy == 3):
             max = -1
             index = -1
@@ -126,73 +195,21 @@ class Simulation:
                 for i in range(len(self.Inbound.Tracks)):
                     if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
                         invalid.append(i)
-                    if (i not in invalid and self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max ):
+                    if (i not in invalid and self.Outbound.Tracks[self.Inbound.Tracks[i].storedTrains[0].Cars[0].Destination].available > 0 and self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max ):
                         max = self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority
                         index = i
                 ##print(invalid)
                 ##print(index)
                 
                 ##print(len(self.Inbound.Tracks[index].storedTrains))
-                if(len(self.Inbound.Tracks[index].storedTrains) == 0):
+                if(len(invalid)==len(self.Inbound.Tracks)):
                     break
-                destination = self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination
-                if (self.Outbound.Tracks[destination].available < 1):
-                    invalid.append(index)
-                    operationTime = operationTime + (self.sendOutbound() * 65)
-                self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-                self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-                carsSorted = carsSorted + 1
-
-
-
-
-
-
-
-
-
-
-
-            """
-            max = -1
-            index = 0
-            ValidExists = True ##used to indicate if the max is valid or not
-
-            ##install checks for available space of tracks.
-            ##finds max priority of top value in queues.
-            while (ValidExists):
-                max = 0
-                skip = []
-                index = 0
-                for i in range(len(self.Inbound.Tracks)):
-                    ##ensures that the maximum, VALID railcar will be chosen
-                    if(len(self.Inbound.Tracks[i].storedTrains)==0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0):
-                        skip.append(i)
-                        break
-                    if(self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max and i not in skip):
-                        ##print(self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority)
-                        max = self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority
-                        index = i
-
-                ##stops classifying if no railcars can be sorted validly
-                if(len(skip) >= len(self.Inbound.Tracks)):
-                    ValidExists = False
-                    break
-                if(len(self.Inbound.Tracks[i].storedTrains)==0):
-                    break
-                if(index in skip):
-                    break
-                ##checks if railcar can be placed in the outbound track.
-                if(self.Outbound.Tracks[self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination].available - 1 < 1):
-                    self.sendOutbound()
-                else:
-                    temp = self.Inbound.Tracks[index].storedTrains[0].Cars[0]
-                    self.Outbound.addRailcar(temp)
-                    self.Inbound.Tracks[index].removeRailcar(temp)
-                    ##time.sleep(5)
-                    ##print(carsSorted)
+                if (index not in invalid and len(self.Inbound.Tracks[index].storedTrains) != 0 and len(self.Inbound.Tracks[index].storedTrains[0].Cars) != 0):
+                    self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                    self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
                     carsSorted = carsSorted + 1
-        """
+                else:
+                    break
 
         stop = time.perf_counter() / 1000
         duration = stop-begin
