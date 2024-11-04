@@ -35,7 +35,7 @@ class Simulation:
             if (self.Outbound.Tracks[temp].available > 0):
                 self.Outbound.addRailcar(self.Inbound.Tracks[choice].storedTrains[0].Cars[0])
                 self.Inbound.removeRailcar(self.Inbound.Tracks[choice].storedTrains[0].Cars[0], choice)
-                carsClassified += 1
+                carsClassified = carsClassified + 1
             else:
                 break
         return carsClassified
@@ -65,7 +65,7 @@ class Simulation:
         ##checks validity of classification options and finds the highest priority to be classified
         for i in range(len(choices)):
             if(choices[i] == -1):
-                break
+                continue
             for carIndex in range(choices[i].length): ##checks for availability
                 if(carIndex >= len(choices[i].Cars)):
                     break
@@ -149,7 +149,6 @@ class Simulation:
             stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
@@ -161,7 +160,7 @@ class Simulation:
         ##checks validity of classification options and finds the highest priority to be classified
         for i in range(len(choices)):
             if(choices[i] == -1):
-                break
+                continue
             for carIndex in range(choices[i].length): ##checks for availability
                 if(carIndex >= len(choices[i].Cars)):
                     break
@@ -178,7 +177,6 @@ class Simulation:
             stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
