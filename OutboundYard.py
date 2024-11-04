@@ -7,7 +7,6 @@ class OutboundYard:
             TrackId = i+1
             self.Tracks.append(OutboundTrack.OutboundTrack(TrackId))
             ##print(len(self.Tracks[i].Cars))
-        print(len(self.Tracks[4].Cars))
             
 
     def addTrain(self, Outbound):

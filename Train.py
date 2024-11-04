@@ -2,7 +2,6 @@ import random as rand
 import Railcar
 class Train:
     def __init__(self, TrackID, ID, length, TrackNum):
-            self.length = length
             self.Cars = []
             self.Destinations = [0] * int(TrackNum)
             self.TotalPriority = 0
@@ -14,3 +13,4 @@ class Train:
                 temp = Railcar.Railcar(carDestination, carPrio, TrackID, ID)
                 self.Cars.append(temp)
             self.TrainID = ID
+            self.length = len(self.Cars)

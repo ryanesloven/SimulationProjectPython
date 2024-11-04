@@ -6,5 +6,5 @@ class Railcar:
         self.Priority = Prio
         self.TrainID = ID
         self.RailcarID = Railcar.RailcarID
-        Railcar.RailcarID =+ 1
+        Railcar.RailcarID = Railcar.RailcarID + 1
         self.TrackNumber = TrackNum

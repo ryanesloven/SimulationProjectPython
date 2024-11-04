@@ -1,15 +1,22 @@
 import random as rand
 class Arrival:
     def forecast(self, time):
-        if(time - self.lastTime > rand.randrange(900)): ##makes at least one train arrive every 15 minutes
-            index = rand.randrange(len(self.Inbound.Tracks))
-            delay = self.Inbound.addTrain(index)
-            self.lastTime = time
-            return delay*10 ##increases internal timer by the number of trains classifeid multiplied by the operation time
-        else:
-            return 0
+        difference = time - self.lastTime 
+        delay = 0
+        while (True):
+            difference = difference - 1800
+            if(difference > 0):
+                index = rand.randrange(len(self.Inbound.Tracks))
+                delay = delay + self.Inbound.addTrain(index)
+                self.lastTime = time
+                self.Wins = self.Wins + 1
+            else:
+                break
+        return delay
+
     def __init__(self, In, Track, SimTime):
         self.lastTime = 0
         self.Inbound = In
         self.Tracker = Track
         self.MaxTime = SimTime
+        self.Wins = 0

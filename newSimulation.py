@@ -34,7 +34,7 @@ class Simulation:
             temp = self.Inbound.Tracks[choice].storedTrains[0].Cars[i].Destination
             if (self.Outbound.Tracks[temp].available > 0):
                 self.Outbound.addRailcar(self.Inbound.Tracks[choice].storedTrains[0].Cars[0])
-                self.Inbound.Tracks[choice].removeRailcar(self.Inbound.Tracks[choice].storedTrains[0].Cars[0])
+                self.Inbound.removeRailcar(self.Inbound.Tracks[choice].storedTrains[0].Cars[0], choice)
                 carsClassified += 1
             else:
                 break
@@ -51,10 +51,9 @@ class Simulation:
                     choice = i
             if (choice != -1):
                 carsSorted += self.DynamicGreedyCombinationLast(choice)
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
@@ -87,10 +86,9 @@ class Simulation:
                     choice = i
             if (choice != -1):
                 carsSorted += self.DynamicGreedyCombinationLast(choice)
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
@@ -111,30 +109,31 @@ class Simulation:
         index = -1
         max = -1
         if(len(invalid)==len(choices)):
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
             return operationTime
+
         for i in range(len(choices)):
-            if(choices[i] != -1 and i not in invalid and self.Outbound.Tracks[choices[i].Destination].available > 0 and choices[i].Priority > max):
+            if(choices[i] == -1):
+                invalid.append(i)
+            if(i not in invalid and self.Outbound.Tracks[choices[i].Destination].available > 0 and choices[i].Priority > max):
                 max = choices[i].Priority
                 index = i
         if(max == -1):
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
-            self.Sorted += carsSorted
             if(carsSorted>0):
                 self.Tracker.functionTime(duration)
                 self.Tracker.operationTime(carsSorted)
             return operationTime
         else:
             self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-            self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+            self.Inbound.removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0], index)
             if(len(self.Inbound.Tracks[index].storedTrains) > 0 and len(self.Inbound.Tracks[index].storedTrains[0].Cars) > 0):
                 choices[index] = self.Inbound.Tracks[index].storedTrains[0].Cars[0]
             else:
@@ -147,7 +146,7 @@ class Simulation:
         index = -1
         max = -1
         if(len(invalid)==len(choices)): ##base case
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
             self.Sorted += carsSorted
@@ -176,7 +175,7 @@ class Simulation:
                 index = i
 
         if(max == -1):
-            stop = time.perf_counter() / 1000000
+            stop = time.perf_counter() *1000
             duration = stop - start
             operationTime = 650 * self.sendOutbound()
             self.Sorted += carsSorted
@@ -198,7 +197,7 @@ class Simulation:
         
 
     def callDynamic(self):
-        begin = time.perf_counter() / 1000000
+        begin = time.perf_counter() *1000 
 
         if(self.policy==1):
             invalid = []
@@ -263,7 +262,7 @@ class Simulation:
         carsSorted = 0
         operationTime = 0
         index = 0 ##used to prevent unnecessary looping for queue/vector operations.
-        begin = time.perf_counter() / 1000000
+        begin = time.perf_counter() *1000
         if (self.policy == 1): ##TMP-Full
             index = -1
             while(True):
@@ -331,7 +330,7 @@ class Simulation:
                         for cars in range(len(self.Inbound.Tracks[index].storedTrains[0].Cars)):
                             if(self.Outbound.Tracks[self.Inbound.Tracks[index].storedTrains[0].Cars[0].Destination].available < 1):
                                 self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-                                self.Inbound.Tracks[index].removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                                self.Inbound.removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0], index)
                                 carsSorted = carsSorted + 1
                             else:
                                 break
@@ -347,21 +346,25 @@ class Simulation:
             while(True):
                 max = -1
                 invalid = []
+                index = -1
                 for i in range(len(self.Inbound.Tracks)):
-                    if(len(self.Inbound.Tracks[i].storedTrains) == 0 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0 or self.Outbound.Tracks[self.Inbound.Tracks[i].storedTrains[0].Cars[0].Destination].available < 1):
+                    if(len(self.Inbound.Tracks[i].storedTrains) < 1 or len(self.Inbound.Tracks[i].storedTrains[0].Cars) == 0 or self.Outbound.Tracks[self.Inbound.Tracks[i].storedTrains[0].Cars[0].Destination].available < 1):
                         invalid.append(i)
                     if (i not in invalid and self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority > max ):
                         max = self.Inbound.Tracks[i].storedTrains[0].Cars[0].Priority
                         index = i
-                if(len(invalid)==len(self.Inbound.Tracks) or max == -1):
+                if(len(invalid)==len(self.Inbound.Tracks) or max == -1 or index == -1):
                     break
                 else:
-                    self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-                    self.Inbound.removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
-                    carsSorted = carsSorted + 1
+                    if(index in invalid):
+                        break
+                    else:
+                        self.Outbound.addRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0])
+                        self.Inbound.removeRailcar(self.Inbound.Tracks[index].storedTrains[0].Cars[0], index)
+                        carsSorted = carsSorted + 1
 
         operationTime = 650*self.sendOutbound()
-        stop = time.perf_counter() / 1000000
+        stop = time.perf_counter() *1000 
         duration = stop-begin
         if(carsSorted>0):
             self.Tracker.functionTime(duration)
