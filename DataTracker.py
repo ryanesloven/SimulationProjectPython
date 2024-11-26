@@ -5,6 +5,8 @@ class DataTracker:
         self.OperationDataStorage = "OperationDataStore.txt"
         self.Function = open(self.FunctionDataStorage, "a")
         self.Operation = open(self.OperationDataStorage, "a")
+        self.Operation.truncate(0)
+        self.Function.truncate(0)
         self.TotalCars = 0
         self.TotalTime = 0
 
