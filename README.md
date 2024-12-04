@@ -7,6 +7,9 @@ The actual simulation works by having railcars stored in a list within another l
 Policy was mentioned earlier in this document and refers to how trains and railcars are viewed. The three polcies are TMP-Split, TMP-Full, and TMP-Last which have been previously mentioned in works done by Boysen et. al.. TMP-Split treats all railcars as independent with classification being done based only by the railcar's priority compared with other options. TMP-Full views railcars only as the trains they are part of, classification is done based on the total priority of the train compared to other trains. TMP-Split is a combination of both TMP-Full and TMP-Split, classification is done based on the total priority of trains compared to one another until the last train is reached at which point individual railcars can be classified instead of the entire train.
 
 The Simulation is run using the following steps:
-1. Execute the Driver.py file.
-2. Answer the prompts the terminal provides. These inputs must be integers corresponding to the choices shown in the terminal.
-3. Once all prompts are answered the simulation will be run. The simulation will return the average performance of the selected choices regarding the runtime and the number of railcars processed.
+1. Download the Project, make sure all files are stored in the same location.
+2. Open a terminal and change the directory until it is inside the directory where the project is stored.
+3. Type in the terminal "pip install -r requirements.txt" and then hit enter.
+4. Execute the Driver.py file. This can be done using python .\Driver.py from the terminal.
+5. Answer the prompts the terminal provides. These inputs must be integers corresponding to the choices shown in the terminal.
+6. Once all prompts are answered the simulation will be run. The simulation will return the average performance of the selected choices regarding the runtime and the number of railcars processed.
